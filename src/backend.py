@@ -4,11 +4,9 @@ import numpy as np
 import utils
 import constants
 from PIL import Image
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, UploadFile
 from collections import defaultdict
-
-
-app = FastAPI()
+from fastapi.middleware.cors import CORSMiddleware
 
 
 async def file_to_cv_image(file: UploadFile):
@@ -61,8 +59,23 @@ def get_anses(cv_image):
         # Get answers
         return get_anses_matrix(ans_matrix)
 
-@app.post("/blank")
+
+app = FastAPI()
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.post("/api/blank")
 async def upload_file(file_student: UploadFile, file_teacher: UploadFile):
+
     cv_image_st = await file_to_cv_image(file_student)
     cv_image_te = await file_to_cv_image(file_teacher)
     answers_student = get_anses(cv_image_st)
