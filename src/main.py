@@ -3,7 +3,7 @@ import numpy as np
 import utils
 import constants
 
-path = "../dataset_blanks/student_var3.jpg"
+path = "../dataset_blanks/stud1.jpg"
 width_img = 1242
 height_img = 1756
 
@@ -65,11 +65,21 @@ answers = []
 for i, row in enumerate(ans_matrix):
     for j, col in enumerate(row):
         sum_elem = np.sum(col)
+        sums.append(sum_elem)
         if sum_elem > constants.FILL_THRESH:
             answers.append([i+1, j+1])
 
 print({"answers": answers})
 
+#To Lev
+img1 = constants.crop_img(img_area_thresh, constants.ANCHORS_POINTS["group_1"])
+img2 = constants.crop_img(img_area_thresh, constants.ANCHORS_POINTS["group_2"])
+img3 = constants.crop_img(img_area_thresh, constants.ANCHORS_POINTS["list_number_1"])
+img4 = constants.crop_img(img_area_thresh, constants.ANCHORS_POINTS["list_number_2"])
+cv2.imwrite("./group1.jpg", img1)
+cv2.imwrite("./group2.jpg", img2)
+
+
 img_area_stacked = utils.stackImages(([img_area, img_area_canny, img_area_contours, img_area_thresh],), 0.5)
-cv2.imshow("Original", img_area_stacked)
-cv2.waitKey(0)
+#cv2.imshow("Original", img_area_stacked)
+#cv2.waitKey(0)
