@@ -3,13 +3,9 @@ import io
 import numpy as np
 import utils
 import constants
-import base64
 from PIL import Image
-from typing import Annotated
 from fastapi import FastAPI, File, UploadFile
 from collections import defaultdict
-from typing import Annotated
-import asyncio
 
 
 app = FastAPI()
@@ -37,7 +33,6 @@ def get_anses_matrix(ans_matrix):
 
 
 def get_anses(cv_image):
-    print(type(cv_image))
     width_img = 1242
     height_img = 1756
     img = cv2.resize(cv_image, (width_img, height_img))
@@ -76,14 +71,13 @@ async def upload_file(file_student: UploadFile, file_teacher: UploadFile):
     all_answers = 0
     correct_answers = 0
 
-    print(answers_student)
     for task, anses in answers_student.items():
         if task not in answers_teacher:
             all_answers += len(anses)
+            continue
         for ans in anses:
             if ans in answers_teacher[task]:
                 correct_answers += 1
-            else:
-                all_answers += 1
+        all_answers += len(anses)
 
     return {"correct_answers": correct_answers, "all_answers": all_answers}
