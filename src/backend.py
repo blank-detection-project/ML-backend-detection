@@ -7,13 +7,13 @@ from PIL import Image
 from fastapi import FastAPI, UploadFile
 from collections import defaultdict
 from fastapi.middleware.cors import CORSMiddleware
+from model_eval import get_handwritten_text
 
 
 async def file_to_cv_image(file: UploadFile):
     img_bytes = await file.read()
     stream = io.BytesIO(img_bytes)
     img = Image.open(stream)
-    img.show()
     open_cv_image = np.array(img)
     open_cv_image = open_cv_image[:, :, ::-1].copy()
     cv2.imwrite("res2.jpg", open_cv_image)
@@ -54,10 +54,14 @@ def get_anses(cv_image):
         img_area_gray = cv2.cvtColor(img_area, cv2.COLOR_BGR2GRAY)
         # Apply threshold
         img_area_thresh = cv2.threshold(img_area_gray, 220, 255, cv2.THRESH_BINARY_INV)[1]
+        # Get family name
+        family_name_img = constants.crop_img(img_area, constants.ANCHORS_POINTS["family_name"])
+        im_pil = Image.fromarray(family_name_img)
+        family_name = get_handwritten_text(im_pil)
         # Get answers images
         ans_matrix = utils.split_boxes(constants.crop_img(img_area_thresh, constants.ANCHORS_POINTS["answers"]))
         # Get answers
-        return get_anses_matrix(ans_matrix)
+        return get_anses_matrix(ans_matrix), family_name
 
 
 app = FastAPI()
@@ -78,8 +82,8 @@ async def upload_file(file_student: UploadFile, file_teacher: UploadFile):
 
     cv_image_st = await file_to_cv_image(file_student)
     cv_image_te = await file_to_cv_image(file_teacher)
-    answers_student = get_anses(cv_image_st)
-    answers_teacher = get_anses(cv_image_te)
+    answers_student, family = get_anses(cv_image_st)
+    answers_teacher, _ = get_anses(cv_image_te)
 
     all_answers = 0
     correct_answers = 0
@@ -93,4 +97,6 @@ async def upload_file(file_student: UploadFile, file_teacher: UploadFile):
                 correct_answers += 1
         all_answers += len(anses)
 
-    return {"correct_answers": correct_answers, "all_answers": all_answers}
+    return {"correctAnswers": correct_answers, "allAnswers": all_answers, "name": family}
+
+
