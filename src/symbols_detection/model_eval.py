@@ -1,14 +1,10 @@
 import os
 
-import uvicorn
-from fastapi import FastAPI, HTTPException
-from typing import List
+from fastapi import HTTPException
 import torch
 import cv2
-from convnet import ConvNetTwoConvTwoDenseLayersWithDropout
 
 from transformers import TrOCRProcessor, VisionEncoderDecoderModel
-from PIL import Image
 
 processor = TrOCRProcessor.from_pretrained('raxtemur/trocr-base-ru')
 trocr_model = VisionEncoderDecoderModel.from_pretrained('raxtemur/trocr-base-ru')

@@ -1,13 +1,12 @@
 import cv2
 import io
 import numpy as np
-import utils
-import constants
+from answers_detection import constants, utils
 from PIL import Image
 from fastapi import FastAPI, UploadFile
 from collections import defaultdict
 from fastapi.middleware.cors import CORSMiddleware
-from model_eval import get_handwritten_text
+from symbols_detection.model_eval import get_handwritten_text
 
 
 async def file_to_cv_image(file: UploadFile):
@@ -16,7 +15,6 @@ async def file_to_cv_image(file: UploadFile):
     img = Image.open(stream)
     open_cv_image = np.array(img)
     open_cv_image = open_cv_image[:, :, ::-1].copy()
-    cv2.imwrite("res2.jpg", open_cv_image)
     return open_cv_image
 
 

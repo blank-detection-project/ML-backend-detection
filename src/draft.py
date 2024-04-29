@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
-import utils
-import constants
+from src.answers_detection import constants, utils
 
 path = "../dataset_blanks/stud1.jpg"
 width_img = 1242
