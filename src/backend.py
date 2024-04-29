@@ -29,9 +29,10 @@ def get_anses_matrix(ans_matrix):
 
 
 def get_anses(cv_image):
-    width_img = 1242
-    height_img = 1756
-    img = cv2.resize(cv_image, (width_img, height_img))
+    width_scan = constants.SCAN_WIDTH
+    height_scan = constants.SCAN_HEIGHT
+    # Prepare img
+    img = cv2.resize(cv_image, (width_scan, height_scan))
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img_blur = cv2.GaussianBlur(img_gray, (5, 5), 1)
     img_canny = cv2.Canny(img_blur, 10, 50)
@@ -43,8 +44,8 @@ def get_anses(cv_image):
     if biggest_con.size != 0:
         biggest_con_new = utils.reorder(biggest_con)
 
-        width_area = 1500
-        height_area = 1300
+        width_area = constants.ANSWER_AREA_WIDTH
+        height_area = constants.ANSWER_AREA_HEIGHT
         pt1 = np.float32(biggest_con_new)
         pt2 = np.float32([[0, 0], [width_area, 0], [0, height_area], [width_area, height_area]])
         matrix = cv2.getPerspectiveTransform(pt1, pt2)

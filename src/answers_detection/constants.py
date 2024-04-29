@@ -50,6 +50,11 @@ ANCHORS_POINTS = {
 
 FILL_THRESH = 200000
 
+ANSWER_AREA_WIDTH = 1500
+ANSWER_AREA_HEIGHT = 1300
+SCAN_WIDTH = 1242
+SCAN_HEIGHT = 1756
+
 def draw_points(img):
     for _, anchor in ANCHORS_POINTS.items():
         for point in anchor:
@@ -60,5 +65,3 @@ def crop_img(img, points):
     w1, h1 = points[0]
     w2, h2 = points[1]
     return img[h1:h2+1, w1:w2+1]
-
-
