@@ -1,10 +1,12 @@
 import cv2
 import numpy as np
+
+import src.answers_detection.constants
 from src.answers_detection import constants, utils
 
 path = "../dataset_blanks/stud1.jpg"
-width_img = 1242
-height_img = 1756
+width_img = src.answers_detection.constants.SCAN_WIDTH
+height_img = src.answers_detection.constants.SCAN_HEIGHT
 
 # Prepocessing
 img = cv2.imread(path)
@@ -27,8 +29,8 @@ if biggest_con.size != 0:
     cv2.drawContours(img_biggest_contour, biggest_con, -1, (0, 255, 0), 20)
     biggest_con_new = utils.reorder(biggest_con)
 
-    width_area = 1500
-    height_area = 1300
+    width_area = src.answers_detection.constants.ANSWER_AREA_WIDTH
+    height_area = src.answers_detection.constants.ANSWER_AREA_HEIGHT
     pt1 = np.float32(biggest_con_new)
     pt2 = np.float32([[0, 0], [width_area, 0], [0, height_area], [width_area, height_area]])
     matrix = cv2.getPerspectiveTransform(pt1, pt2)
