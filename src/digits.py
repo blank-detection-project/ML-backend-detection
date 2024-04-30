@@ -47,12 +47,32 @@ def get_digits(path):
         img2 = constants.crop_img(img_area_thresh, constants.ANCHORS_POINTS["group_2"])
         img3 = constants.crop_img(img_area_thresh, constants.ANCHORS_POINTS["list_number_1"])
         img4 = constants.crop_img(img_area_thresh, constants.ANCHORS_POINTS["list_number_2"])
-        return [img1, img2, img3, img4]
+        img5 = constants.crop_img(img_area_thresh, constants.ANCHORS_POINTS["variant"])
+        result = [img1, img2, img3, img4, img5]
 
-images_all = []
+        mnist_size = 28
+        for i in range(len(result)):
+            result[i] = cv2.resize(result[i], (mnist_size, mnist_size))
+
+        return result
+
+groups_all = []
+lists_all = []
+variants_all = []
+
 for i in range(1, 10):
     path = f"../dataset_blanks/stud{i}.jpg"
     images = get_digits(path)
-    for j, (name, img) in enumerate(zip(["group1", "group2", "list1", "list2"], images)):
-        print(j)
-        cv2.imwrite(f"./result/{i}{j}{name}.jpg", img)
+    for j, (name, img) in enumerate(zip(["group1", "group2", "list1", "list2", "variant"], images)):
+        cv2.imwrite(f"./result_lev/{(i - 1) * 5 + j}.jpg", img)
+        if name.startswith("group"):
+            groups_all.append(img)
+        elif name.startswith("list"):
+            lists_all.append(img)
+        else:
+            variants_all.append(img)
+
+stacked = utils.stackImages((groups_all, lists_all), 0.5)
+cv2.imwrite(f"./result_lev/all.jpg", stacked)
+cv2.imshow("Original", stacked)
+cv2.waitKey(0)
