@@ -1,11 +1,11 @@
 import cv2
 import numpy as np
-import constants
+from detection_functions import constants
 import io
 from PIL import Image
 from fastapi import UploadFile
 from collections import defaultdict
-from ..symbols_detection.model_eval import get_handwritten_text
+from symbols_detection.model_eval import get_handwritten_text
 
 
 ## TO STACK ALL THE IMAGES IN ONE WINDOW
@@ -102,6 +102,10 @@ async def file_to_cv_image(file: UploadFile):
     open_cv_image = open_cv_image[:, :, ::-1].copy()
     return open_cv_image
 
+
+def np2cv(np_img: np.array):
+    open_cv_image = np_img[:, :, ::-1].copy()
+    return open_cv_image
 
 def get_anses_matrix(ans_matrix):
     answers = defaultdict(list)

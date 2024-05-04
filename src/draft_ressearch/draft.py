@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
 
-import src.answers_detection.constants
-from src.answers_detection import constants, detection_utils
+import src.detection_functions.constants
+from src.detection_functions import constants, detection_utils
 
 path = "../../dataset_blanks/stud1.jpg"
 path = "res_tmp/page-0.jpg"
