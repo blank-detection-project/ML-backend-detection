@@ -2,9 +2,10 @@ import cv2
 import numpy as np
 
 import src.answers_detection.constants
-from src.answers_detection import constants, utils
+from src.answers_detection import constants, detection_utils
 
-path = "../dataset_blanks/stud1.jpg"
+path = "../../dataset_blanks/stud1.jpg"
+path = "res_tmp/page-0.jpg"
 width_img = src.answers_detection.constants.SCAN_WIDTH
 height_img = src.answers_detection.constants.SCAN_HEIGHT
 
@@ -22,12 +23,12 @@ contours, hierarchy = cv2.findContours(img_canny, cv2.RETR_EXTERNAL, cv2.CHAIN_A
 cv2.drawContours(img_contours, contours, -1, (0, 255, 0), 5)
 
 #Find rectangles
-rect_con = utils.rect_contour(contours)
-biggest_con = utils.get_corner_points(rect_con[0])
+rect_con = detection_utils.rect_contour(contours)
+biggest_con = detection_utils.get_corner_points(rect_con[0])
 
 if biggest_con.size != 0:
     cv2.drawContours(img_biggest_contour, biggest_con, -1, (0, 255, 0), 20)
-    biggest_con_new = utils.reorder(biggest_con)
+    biggest_con_new = detection_utils.reorder(biggest_con)
 
     width_area = src.answers_detection.constants.ANSWER_AREA_WIDTH
     height_area = src.answers_detection.constants.ANSWER_AREA_HEIGHT
@@ -43,7 +44,7 @@ if biggest_con.size != 0:
     img_area_blur = cv2.GaussianBlur(img_area, (5, 5), 1)
     img_area_canny = cv2.Canny(img_area_blur, 10, 50)
     contours, hierarchy = cv2.findContours(img_area_canny, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-    rect_con = utils.rect_contour(contours)
+    rect_con = detection_utils.rect_contour(contours)
     cv2.drawContours(img_area_contours, rect_con, -1, (0, 255, 0), 3)
     cv2.drawContours(img_area_contours_all, contours, -1, (0, 255, 0), 2)
     # Apply threshold
@@ -59,7 +60,7 @@ image_array = ([img, img_gray, img_blur, img_canny],
 
 
 constants.draw_points(img_area_contours)
-ans_matrix = utils.split_boxes(constants.crop_img(img_area_thresh, constants.ANCHORS_POINTS["answers"]))
+ans_matrix = detection_utils.split_boxes(constants.crop_img(img_area_thresh, constants.ANCHORS_POINTS["answers"]))
 sums = []
 
 answers = []
@@ -82,6 +83,6 @@ variant = constants.crop_img(img_area_thresh, constants.ANCHORS_POINTS["variant"
 #cv2.imwrite("./group2.jpg", img2)
 
 
-img_area_stacked = utils.stackImages(([img_area, img_area_canny, img_area_contours, img_area_thresh],), 0.5)
+img_area_stacked = detection_utils.stackImages(([img_area, img_area_canny, img_area_contours, img_area_thresh],), 0.5)
 cv2.imshow("Original", img_area_stacked)
 cv2.waitKey(0)

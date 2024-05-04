@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 import src.answers_detection.constants
-from src.answers_detection import constants, utils
+from src.answers_detection import constants, detection_utils
 
 
 def get_digits(path):
@@ -24,12 +24,12 @@ def get_digits(path):
     cv2.drawContours(img_contours, contours, -1, (0, 255, 0), 5)
 
     #Find rectangles
-    rect_con = utils.rect_contour(contours)
-    biggest_con = utils.get_corner_points(rect_con[0])
+    rect_con = detection_utils.rect_contour(contours)
+    biggest_con = detection_utils.get_corner_points(rect_con[0])
 
     if biggest_con.size != 0:
         cv2.drawContours(img_biggest_contour, biggest_con, -1, (0, 255, 0), 20)
-        biggest_con_new = utils.reorder(biggest_con)
+        biggest_con_new = detection_utils.reorder(biggest_con)
 
         width_area = src.answers_detection.constants.ANSWER_AREA_WIDTH
         height_area = src.answers_detection.constants.ANSWER_AREA_HEIGHT
@@ -72,7 +72,7 @@ for i in range(1, 10):
         else:
             variants_all.append(img)
 
-stacked = utils.stackImages((groups_all, lists_all), 0.5)
+stacked = detection_utils.stackImages((groups_all, lists_all), 0.5)
 cv2.imwrite(f"./result_lev/all.jpg", stacked)
 cv2.imshow("Original", stacked)
 cv2.waitKey(0)
