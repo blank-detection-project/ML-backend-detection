@@ -146,3 +146,19 @@ def get_anses(cv_image):
         ans_matrix = split_boxes(constants.crop_img(img_area_thresh, constants.ANCHORS_POINTS["answers"]))
         # Get answers
         return get_anses_matrix(ans_matrix), family_name
+
+
+def get_answers_stats(answers_student: dict[int, list], answers_teacher: dict[int, list]) -> (int, int):
+    all_answers = 0
+    correct_answers = 0
+
+    for task, anses in answers_student.items():
+        if task not in answers_teacher:
+            all_answers += len(anses)
+            continue
+        for ans in anses:
+            if ans in answers_teacher[task]:
+                correct_answers += 1
+        all_answers += len(anses)
+
+    return all_answers, correct_answers
