@@ -55,6 +55,10 @@ ANSWER_AREA_HEIGHT = 1300
 SCAN_WIDTH = 1242
 SCAN_HEIGHT = 1756
 
+# Параметры матрицы
+MATRIX_ROWS = 12
+MATRIX_COLUMNS = 15
+
 def draw_points(img):
     for _, anchor in ANCHORS_POINTS.items():
         for point in anchor:

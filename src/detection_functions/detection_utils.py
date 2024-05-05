@@ -1,7 +1,8 @@
 import cv2
 import numpy as np
-from detection_functions import constants
 import io
+import pandas as pd
+from detection_functions import constants
 from PIL import Image
 from fastapi import UploadFile
 from collections import defaultdict
@@ -83,10 +84,10 @@ def reorder(points):
 
 
 def split_boxes(img) -> [np.array]:
-    rows = np.array_split(img, 12)
+    rows = np.array_split(img, constants.MATRIX_ROWS)
     matrix = []
     for row in rows:
-        cols = np.array_split(row.T, 15)
+        cols = np.array_split(row.T, constants.MATRIX_COLUMNS)
         row_marks = []
         for elem in cols:
             col = elem.T[5:-5, 5:-5]
@@ -164,5 +165,16 @@ def get_answers_stats(answers_student: dict[int, list], answers_teacher: dict[in
             if ans in answers_teacher[task]:
                 correct_answers += 1
         all_answers += len(anses)
-
     return all_answers, correct_answers
+
+
+def to_bites(df: pd.DataFrame) -> bytes:
+    output = io.BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+
+    df.to_excel(writer, sheet_name='Sheet1')
+
+    writer.close()
+    xlsx_data = output.getvalue()
+
+    return xlsx_data

@@ -1,11 +1,14 @@
-import cv2
-from fastapi import FastAPI, UploadFile
+import pandas as pd
+import numpy as np
+import io
+from fastapi import FastAPI, UploadFile, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, StreamingResponse
 from detection_functions.detection_utils import (
     get_anses,
     file_to_cv_image,
     get_answers_stats,
-    np2cv
+    to_bites
 )
 from detection_functions.pdf_to_img import (
     upload_file2flitz_doc,
@@ -51,4 +54,14 @@ async def upload_file(pdf_students: UploadFile, file_teacher: UploadFile):
         answers_student, family = get_anses(cv_image_student)
         all_answers, correct_answers = get_answers_stats(answers_student, answers_teacher)
         result.append({"correctAnswers": correct_answers, "allAnswers": all_answers, "name": family})
-    return result
+    #return {"result": result, "answers": answers_teacher}
+
+    df = pd.DataFrame(np.zeros((4, 5)))
+    buffer = io.BytesIO()
+    with pd.ExcelWriter(buffer) as writer:
+        df.to_excel(writer, index=False)
+    return StreamingResponse(
+        io.BytesIO(buffer.getvalue()),
+        media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        headers={"Content-Disposition": f"attachment; filename=data.xlsx"}
+    )
