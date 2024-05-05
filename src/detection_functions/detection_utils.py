@@ -2,11 +2,11 @@ import cv2
 import numpy as np
 import io
 import pandas as pd
-from detection_functions import constants
+from src.detection_functions import constants
 from PIL import Image
 from fastapi import UploadFile
 from collections import defaultdict
-from symbols_detection.model_eval import get_handwritten_text
+from src.symbols_detection.model_eval import get_handwritten_text
 
 
 ## TO STACK ALL THE IMAGES IN ONE WINDOW
@@ -178,3 +178,15 @@ def to_bites(df: pd.DataFrame) -> bytes:
     xlsx_data = output.getvalue()
 
     return xlsx_data
+
+
+def get_df(anses_dict: dict[int, list], page_index: int):
+    arr = np.zeros((12, 15), dtype=int)
+    for num, anses in anses_dict.items():
+        for ans in anses:
+            arr[int(num)][anses] = 1
+    res = pd.DataFrame(arr)
+    res.columns = [np.arange(1, 16)]
+    res["task"] = np.arange(1, 13)
+    res["page"] = page_index + 1
+    return res
