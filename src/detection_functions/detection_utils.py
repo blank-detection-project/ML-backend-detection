@@ -154,17 +154,22 @@ def get_anses(cv_image):
 
 
 def get_answers_stats(answers_student: dict[int, list], answers_teacher: dict[int, list]) -> (int, int):
-    all_answers = 0
-    correct_answers = 0
-
-    for task, anses in answers_student.items():
-        if task not in answers_teacher:
-            all_answers += len(anses)
+    all_answers = []
+    correct_answers = []
+    for i in range(constants.MATRIX_ROWS):
+        if i not in answers_student:
+            all_answers.append(0)
+            correct_answers.append(0)
             continue
-        for ans in anses:
-            if ans in answers_teacher[task]:
-                correct_answers += 1
-        all_answers += len(anses)
+        cur_all = len(answers_student[i])
+        if i not in answers_teacher:
+            all_answers.append(cur_all)
+            correct_answers.append(0)
+            continue
+        cur_correct = len(set(answers_student[i]) & set(answers_teacher[i]))
+        all_answers.append(cur_all)
+        correct_answers.append(cur_correct)
+
     return all_answers, correct_answers
 
 
@@ -180,13 +185,12 @@ def to_bites(df: pd.DataFrame) -> bytes:
     return xlsx_data
 
 
-def get_df(anses_dict: dict[int, list], page_index: int):
+def get_df(anses_dict: dict[int, list], page_index: int) -> pd.DataFrame:
     arr = np.zeros((12, 15), dtype=int)
     for num, anses in anses_dict.items():
-        for ans in anses:
-            arr[int(num)][anses] = 1
+        arr[int(num)][anses] = 1
     res = pd.DataFrame(arr)
-    res.columns = [np.arange(1, 16)]
-    res["task"] = np.arange(1, 13)
+    res.columns = np.arange(1, constants.MATRIX_COLUMNS + 1)
+    res.insert(0, "task", np.arange(1, constants.MATRIX_ROWS + 1))
     res["page"] = page_index + 1
     return res

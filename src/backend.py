@@ -8,7 +8,7 @@ from src.detection_functions.detection_utils import (
     get_anses,
     file_to_cv_image,
     get_answers_stats,
-    to_bites
+    get_df
 )
 from src.detection_functions.pdf_to_img import (
     upload_file2flitz_doc,
@@ -49,17 +49,19 @@ async def upload_file(pdf_students: UploadFile, file_teacher: UploadFile):
 
     flitz_doc = await upload_file2flitz_doc(pdf_students)
     np_images = get_pdf_images(flitz_doc)
-    result = []
+    result_frames = []
     for page_number, cv_image_student in enumerate(np_images):
         answers_student, family = get_anses(cv_image_student)
+        student_dataframe = get_df(answers_student, page_number)
         all_answers, correct_answers = get_answers_stats(answers_student, answers_teacher)
-        result.append({"correctAnswers": correct_answers, "allAnswers": all_answers, "name": family})
-    #return {"result": result, "answers": answers_teacher}
+        student_dataframe["all_answers"] = all_answers
+        student_dataframe["correct_answers"] = correct_answers
+        result_frames.append(student_dataframe)
 
-    df = pd.DataFrame(np.zeros((4, 5)))
+    df = pd.concat(result_frames)
     buffer = io.BytesIO()
     with pd.ExcelWriter(buffer) as writer:
-        df.to_excel(writer, index=False)
+        df.to_excel(writer, sheet_name="Sheet1", index=False)
     return StreamingResponse(
         io.BytesIO(buffer.getvalue()),
         media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
