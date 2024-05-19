@@ -2,15 +2,15 @@ import cv2
 import numpy as np
 
 import src.detection_functions.constants
-from src.detection_functions import constants, detection_utils
+from src.detection_functions import constants,detection_utils
 
-path = "../../dataset_blanks/stud1.jpg"
-path = "res_tmp/page-0.jpg"
-width_img = src.answers_detection.constants.SCAN_WIDTH
-height_img = src.answers_detection.constants.SCAN_HEIGHT
+path = "dataset_blanks/stud1.jpg"
+width_img = src.detection_functions.constants.SCAN_WIDTH
+height_img = src.detection_functions.constants.SCAN_HEIGHT
 
 # Prepocessing
 img = cv2.imread(path)
+print(len(img))
 img = cv2.resize(img, (width_img, height_img))
 img_contours = img.copy()
 img_biggest_contour = img.copy()
@@ -30,8 +30,8 @@ if biggest_con.size != 0:
     cv2.drawContours(img_biggest_contour, biggest_con, -1, (0, 255, 0), 20)
     biggest_con_new = detection_utils.reorder(biggest_con)
 
-    width_area = src.answers_detection.constants.ANSWER_AREA_WIDTH
-    height_area = src.answers_detection.constants.ANSWER_AREA_HEIGHT
+    width_area = src.detection_functions.constants.ANSWER_AREA_WIDTH
+    height_area = src.detection_functions.constants.ANSWER_AREA_HEIGHT
     pt1 = np.float32(biggest_con_new)
     pt2 = np.float32([[0, 0], [width_area, 0], [0, height_area], [width_area, height_area]])
     matrix = cv2.getPerspectiveTransform(pt1, pt2)
@@ -79,10 +79,16 @@ img2 = constants.crop_img(img_area_thresh, constants.ANCHORS_POINTS["group_2"])
 img3 = constants.crop_img(img_area_thresh, constants.ANCHORS_POINTS["list_number_1"])
 img4 = constants.crop_img(img_area_thresh, constants.ANCHORS_POINTS["list_number_2"])
 variant = constants.crop_img(img_area_thresh, constants.ANCHORS_POINTS["variant"])
+digits = [img1, img2, img3, img4]
+for i in range(len(digits)):
+    digits[i] = cv2.resize(digits[i], (27, 27))
+    path_save = "result_dataset/" + path.split("/")[1][:-4] + f"_{i}.jpg"
+    cv2.imwrite(path_save, digits[i])
 #cv2.imwrite("./group1.jpg", img1)
 #cv2.imwrite("./group2.jpg", img2)
 
 
 img_area_stacked = detection_utils.stackImages(([img_area, img_area_canny, img_area_contours, img_area_thresh],), 0.5)
+#img_area_stacked = detection_utils.stackImages((digits,), 0.5)
 cv2.imshow("Original", img_area_stacked)
 cv2.waitKey(0)

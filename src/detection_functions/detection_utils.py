@@ -6,7 +6,7 @@ from src.detection_functions import constants
 from PIL import Image
 from fastapi import UploadFile
 from collections import defaultdict
-from src.symbols_detection.model_eval import get_handwritten_text
+#from src.symbols_detection.model_eval import get_handwritten_text
 
 
 ## TO STACK ALL THE IMAGES IN ONE WINDOW
@@ -146,7 +146,7 @@ def get_anses(cv_image):
         # Get family name
         family_name_img = constants.crop_img(img_area, constants.ANCHORS_POINTS["family_name"])
         im_pil = Image.fromarray(family_name_img)
-        family_name = get_handwritten_text(im_pil)
+        family_name = "smth"
         # Get answers images
         ans_matrix = split_boxes(constants.crop_img(img_area_thresh, constants.ANCHORS_POINTS["answers"]))
         # Get answers
